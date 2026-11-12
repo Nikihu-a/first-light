@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>初光 First Light</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital@1&family=Noto+Serif+SC:wght@300;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* One world: the minute before sunrise. The scene fills the frame; a quiet title sits
+       bottom-left and three controls bottom-right, and both step back when you stop moving. */
+    --night: #0a0c22;
+    --ink: #f7ebef;
+    --ink-soft: rgba(247, 235, 239, 0.68);
+    --glass: rgba(20, 17, 44, 0.44);
+    --line: rgba(255, 226, 236, 0.26);
+    --dawn: #ffc890;
+    --display: "Noto Serif SC", "Songti SC", "STSong", serif;
+    --latin: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+    --body: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--night); color: var(--ink); font-family: var(--body); overflow: hidden; }
+  #stage { position: fixed; inset: 0; background: var(--night); touch-action: none; }
+  #stage canvas { display: block; width: 100%; height: 100%; }
+
+  .veil { position: fixed; inset: 0; display: grid; place-items: center; background: var(--night); transition: opacity 0.9s ease; }
+  .veil p { margin: 0; padding: 0 24px; font-family: var(--display); font-weight: 300; font-size: 15px; letter-spacing: 0.5em; text-indent: 0.5em; color: var(--ink-soft); text-align: center; }
+  .ready .veil { opacity: 0; pointer-events: none; }
+
+  .chrome { position: fixed; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 22px 24px; pointer-events: none; opacity: 0; transition: opacity 0.6s ease; }
+  .ready .chrome { opacity: 1; }
+  .ready.idle .chrome { opacity: 0; transition-duration: 1.4s; }
+  .ready.idle .chrome:focus-within { opacity: 1; }
+
+  .caption { display: flex; flex-direction: column; gap: 6px; text-shadow: 0 1px 14px rgba(10, 12, 34, 0.55); }
+  .caption h1 { margin: 0; display: flex; align-items: baseline; gap: 12px; font-family: var(--display); font-weight: 300; font-size: 22px; letter-spacing: 0.32em; }
+  .caption h1 span { font-family: var(--latin); font-style: italic; font-size: 19px; letter-spacing: 0.04em; color: var(--ink-soft); }
+  .caption p { margin: 0; font-size: 12.5px; letter-spacing: 0.08em; color: var(--ink-soft); }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; pointer-events: auto; }
+  .controls button { appearance: none; font: inherit; font-size: 13px; letter-spacing: 0.12em; color: var(--ink); background: var(--glass); border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; cursor: pointer; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: border-color 0.2s ease, color 0.2s ease; }
+  .controls button:hover { border-color: var(--dawn); color: var(--dawn); }
+  .controls button:focus-visible { outline: 2px solid var(--dawn); outline-offset: 2px; }
+  .controls button[hidden] { display: none; }
+
+  @media (max-width: 420px) { .chrome { padding: 16px; } .caption h1 { font-size: 19px; } }
+  @media (prefers-reduced-motion: reduce) { .veil, .chrome { transition-duration: 0.01s; } }
+</style>
+</head>
+<body>
+  <div id="stage" aria-label="日出前的湖面，湖心小岛上一棵开满花的树"></div>
+  <div class="chrome">
+    <div class="caption">
+      <h1>初光<span lang="en">First Light</span></h1>
+      <p id="hint">移动鼠标，轻轻转动视角</p>
+    </div>
+    <div class="controls" role="group" aria-label="播放控制">
+      <button id="replay" type="button">重播</button>
+      <button id="pause" type="button" aria-pressed="false">暂停</button>
+      <button id="full" type="button">全屏</button>
+    </div>
+  </div>
+  <div class="veil" id="veil"><p>天快亮了</p></div>
+  <script>
+    if (window.matchMedia('(pointer: coarse)').matches) document.getElementById('hint').textContent = '按住拖动，轻轻转动视角';
+    // paint the waiting screen first, then build the scene
+    requestAnimationFrame(function () {
+      setTimeout(function () {
+        import('./app.js').catch(function (err) {
+          var p = document.querySelector('#veil p');
+          p.style.letterSpacing = '0.08em'; p.style.textIndent = '0';
+          p.textContent = /WebGL/i.test(String(err && err.message))
+            ? '这个浏览器不支持 WebGL2，换用新版 Chrome、Edge 或 Safari 就能看到。'
+            : '画面没能加载出来，刷新页面再试一次。';
+          console.error(err);
+        });
+      }, 40);
+    });
+  </script>
+</body>
+</html>

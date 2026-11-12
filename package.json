@@ -1,0 +1,13 @@
+{
+  "name": "first-light",
+  "private": true,
+  "description": "初光 First Light — a real-time 3D sunrise over a still lake, built with three.js",
+  "scripts": {
+    "build": "mkdir -p public && esbuild src/main.js --bundle --format=esm --minify --target=es2020 --outfile=public/app.js && cp index.html public/index.html",
+    "preview": "npm run build && npx --yes serve public"
+  },
+  "dependencies": {
+    "esbuild": "0.28.2",
+    "three": "0.187.0"
+  }
+}
